@@ -1,26 +1,38 @@
 
+const _ = require('lodash');
 const util = require('util');
 const post = util.promisify(require('request').post);
 
+const apiKey = require('../../config').app.apiKey;
+
 const link = 'https://maps.googleapis.com/maps/api/directions/json?';
-const apiKey = 'AIzaSyAThTaWYcdO7M9-sn74ikhrmfwl-ZbCYAQ'
 
 class RouteWorker {
 
 	async run(data, apiQ, done) {
 		let origin, destination, waypoints, body, distance, time;
-		[origin, destination, waypoints] = this.prepareData(data);
+		let id = data.id;
+		let path = data.path;
+		let origPath = _.cloneDeep(path);
+		[origin, destination, waypoints] = this.prepareData(path);
 		let url = this.constructUrl(origin, destination, waypoints);
 		body = await this.postRequest(url);
 
 		if (body.status === 'OK') {
 			[distance, time] = this.getMin(body.routes);
 			await apiQ.add({
+				id:id,
+				path: origPath,
 				distance: distance,
-				time: time
+				time: time,
+				status: 'success'
 			})
 		} else {
-			await apiQ.add({err: body.status});
+			await apiQ.add({
+				id:id,
+				err: body.status,
+				status: 'failure'
+			});
 		}
 
 		done();
