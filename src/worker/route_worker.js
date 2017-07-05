@@ -1,7 +1,8 @@
 
 const _ = require('lodash');
-const util = require('util');
-const post = util.promisify(require('request').post);
+const {promisify} = require('util');
+const request = require('request');
+const post = promisify(request.post);
 
 const apiKey = require('../../config').app.apiKey;
 
@@ -10,49 +11,52 @@ const link = 'https://maps.googleapis.com/maps/api/directions/json?';
 class RouteWorker {
 
 	async run(data, apiQ, done) {
-		let origin, destination, waypoints, body, distance, time;
+		let origin, destination, waypoints, res, body, distance, time;
 		let id = data.id;
 		let path = data.path;
 		let origPath = _.cloneDeep(path);
-		[origin, destination, waypoints] = this.prepareData(path);
-		let url = this.constructUrl(origin, destination, waypoints);
-		body = await this.postRequest(url);
+		try {
+			[origin, destination, waypoints] = this.prepareData(path);
+			let url = this.constructUrl(origin, destination, waypoints);
+			res = await this.postRequest(url);
+			body = JSON.parse(res.body);
+			if (body.status === 'OK') {
+				[distance, time] = this.getTotal(body.routes[0]);
+				await apiQ.add({
+					id:id,
+					path: origPath,
+					distance: distance,
+					time: time,
+					status: 'success'
+				})
+			} else {
+				await apiQ.add({
+					id:id,
+					err: body.status,
+					status: 'failure'
+				});
+			}
 
-		if (body.status === 'OK') {
-			[distance, time] = this.getMin(body.routes);
-			await apiQ.add({
-				id:id,
-				path: origPath,
-				distance: distance,
-				time: time,
-				status: 'success'
-			})
-		} else {
-			await apiQ.add({
-				id:id,
-				err: body.status,
-				status: 'failure'
-			});
+			done();
+		} catch(e) {
+			done(new Error(e));
 		}
-
-		done();
 	}
 
-	getMin(routes) {
-		let length = routes[0].legs.length;
+	getTotal(routes) {
+		let legs = routes.legs;
+		let length = legs.length;
 		let distance = 0;
 		let time = 0;
 		for(let i = 0; i < length; i++) {
-			distance += routes[0].legs[i].distance.value;
-			time += routes[0].legs[i].duration.value;
+			distance += legs[i].distance.value;
+			time += legs[i].duration.value;
 		}
 		return [distance, time];
 	}
 
 	postRequest(url) {
-		return post(url).then((res) => {
-			return JSON.parse(res.body);
-		});
+		return post(url);
 	}
 
 	prepareData(data) {
