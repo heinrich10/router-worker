@@ -4,14 +4,16 @@
   "description": "workers to handle asynchronous task",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/.bin/istanbul cover ./node_modules/mocha/bin/_mocha"
+    "start": "node api.js",
+    "test": "./node_modules/.bin/nyc ./node_modules/.bin/_mocha",
+    "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
   "keywords": [
     "route",
     "amk"
   ],
   "author": "heinrich10",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "bull": "^3.0.0-rc.3",
     "lodash": "^4.17.4",
@@ -19,8 +21,8 @@
   },
   "devDependencies": {
     "chai": "^4.0.2",
-    "istanbul": "^0.4.5",
     "mocha": "^3.4.2",
+    "nyc": "^11.0.3",
     "sinon": "^2.3.6"
   }
 }
