@@ -4,7 +4,7 @@
   "description": "workers to handle asynchronous task",
   "main": "index.js",
   "scripts": {
-    "start": "node api.js",
+    "start": "node index.js",
     "test": "./node_modules/.bin/nyc ./node_modules/.bin/_mocha",
     "coverage": "./node_modules/.bin/nyc report --reporter=text-lcov > coverage.lcov && codecov"
   },
