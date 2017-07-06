@@ -1,11 +1,6 @@
 machine:
     node:
         version: 8
-general:
-  artifacts:
-      - "coverage"
 test:
   post:
-    - npm coverage
-post:
-    - bash <(curl -s https://codecov.io/bash)
+    - npm run coverage
