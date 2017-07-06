@@ -1,4 +1,5 @@
 # Route Worker
+[![CircleCI](https://circleci.com/gh/heinrich10/router-worker.svg?style=svg)](https://circleci.com/gh/heinrich10/router-worker)  [![codecov](https://codecov.io/gh/heinrich10/router-worker/branch/master/graph/badge.svg)](https://codecov.io/gh/heinrich10/router-worker)
 
 ## Prerequisites
 
