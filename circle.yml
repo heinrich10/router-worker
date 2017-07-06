@@ -3,8 +3,6 @@ machine:
         version: 8
 test:
   override:
-    - mocha test --reporter mocha-junit-reporter:
-      environment:
-        MOCHA_FILE: $CIRCLE_TEST_REPORTS/junit/test-results.xml
+    - mocha test --reporter mocha-junit-reporter --reporter-options mochaFile=$CIRCLE_TEST_REPORTS/junit/test-results.xml
   post:
     - npm test && npm run coverage
