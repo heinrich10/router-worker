@@ -1,4 +1,4 @@
 test/**/*.js
 --reporter mocha-junit-reporter
---reporter-options output=$CIRCLE_TEST_REPORTS/junit/test-results.xml
+--reporter-options mochaFile=$CIRCLE_TEST_REPORTS/junit/test-results.xml
 --check-leaks
