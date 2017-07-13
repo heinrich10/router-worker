@@ -39,7 +39,12 @@ class RouteWorker {
 
 			done();
 		} catch(e) {
-			done(new Error(e));
+			await apiQ.add({
+				id:id,
+				err: "something went wrong",
+				status: 'failure'
+			});
+			done();
 		}
 	}
 
